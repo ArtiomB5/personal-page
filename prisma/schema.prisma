@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl         = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
+}
+
+model Experience {
+  id               String   @id @default(cuid())
+  job              String
+  responsibilities Json
+  companyName      Company  @relation(fields: [companyId], references: [id])
+  companyId        String   @map(name: "company_id")
+  workFrom         DateTime @map(name: "work_from")
+  workTo           DateTime @map(name: "work_to")
+
+  @@map(name: "experience")
+}
+
+model Company {
+  id          String       @id @default(cuid())
+  companyName String       @unique @map(name: "company_name")
+  experience  Experience[]
+
+  @@map(name: "companies")
+}
+
+model Skill {
+  id     String  @id @default(cuid())
+  skill  String  @unique
+  isSoft Boolean @map(name: "is_soft")
+
+  @@map(name: "skills")
+}
+
+model School {
+  id      String   @id @default(cuid())
+  school  String   @unique
+  courses Course[]
+
+  @@map(name: "schools")
+}
+
+model Course {
+  id             String   @id @default(cuid())
+  specialization String
+  school         School   @relation(fields: [schoolId], references: [id])
+  schoolId       String   @map(name: "school_id")
+  educationFrom  DateTime @map(name: "education_from")
+  educationTo    DateTime @map(name: "education_to")
+
+  @@map(name: "courses")
+}
+
+model Language {
+  id       String @id @default(cuid())
+  language String @unique
+  level    String
+
+  @@map(name: "languages")
+}
+
+model Summary {
+  id      String @id @default(cuid())
+  summary String @unique
+
+  @@map(name: "summaries")
+}
+
+model Contact {
+  id      String @id @default(cuid())
+  contact String @unique
+
+  @@map(name: "contacts")
+}
+
+model Link {
+  id          String @id @default(cuid())
+  description String
+  url         String @unique
+
+  @@map(name: "links")
+}
